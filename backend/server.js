@@ -2,7 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes.js'; // <-- 1. Import Auth Routes
+import authRoutes from './routes/authRoutes.js';
+import employeeRoutes from './routes/employeeRoutes.js'; // <-- 1. Import Employee Routes
 
 // Environment variables configuration
 dotenv.config();
@@ -14,7 +15,8 @@ app.use(cors());
 app.use(express.json());
 
 // Routes Middleware
-app.use('/api/auth', authRoutes); // <-- 2. Use Auth Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/employees', employeeRoutes); // <-- 2. Use Employee Routes
 
 // Basic Test Route
 app.get('/', (req, res) => {
