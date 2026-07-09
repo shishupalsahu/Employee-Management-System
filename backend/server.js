@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import authRoutes from './routes/authRoutes.js'; // <-- 1. Import Auth Routes
 
 // Environment variables configuration
 dotenv.config();
@@ -10,7 +11,10 @@ const app = express();
 
 // Middlewares
 app.use(cors());
-app.use(express.json()); // Taaki server JSON data samajh sake
+app.use(express.json());
+
+// Routes Middleware
+app.use('/api/auth', authRoutes); // <-- 2. Use Auth Routes
 
 // Basic Test Route
 app.get('/', (req, res) => {
@@ -24,7 +28,6 @@ const MONGO_URI = process.env.MONGO_URI;
 mongoose.connect(MONGO_URI)
     .then(() => {
         console.log('MongoDB Connected Successfully! ✅');
-        // Database connect hone ke baad hi server start hoga
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT} 🚀`);
         });
