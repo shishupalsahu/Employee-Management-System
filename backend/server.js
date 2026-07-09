@@ -6,8 +6,7 @@ import authRoutes from './routes/authRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
 import leaveRoutes from './routes/leaveRoutes.js';
 import taskRoutes from './routes/taskRoutes.js'; // <-- 1. Import Task Routes
-
-// Environment variables configuration
+import notificationRoutes from './routes/notificationRoutes.js'; // Environment variables configuration
 dotenv.config();
 
 const app = express();
@@ -21,8 +20,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/leave', leaveRoutes);
 app.use('/api/tasks', taskRoutes); // <-- 2. Use Task Routes
-
-// Basic Test Route
+app.use('/api/notifications', notificationRoutes);// Basic Test Route
 app.get('/', (req, res) => {
     res.send('Employee Management System API is running...');
 });

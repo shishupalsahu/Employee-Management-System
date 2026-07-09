@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import Sidebar from '../components/Sidebar';
 import { AuthContext } from '../context/AuthContext';
 import { Users, Clock, CheckCircle2, UserCircle, Plus, Trash2, UserPlus, X, Check, Calendar, AlertCircle } from 'lucide-react';
-
+import NotificationBell from '../components/NotificationBell';
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const { user } = useContext(AuthContext);
@@ -139,13 +139,18 @@ const AdminDashboard = () => {
             <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
             <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-                <header className="h-20 border-b border-slate-900 bg-slate-900/40 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-10">
-                    <h2 className="text-xl font-bold text-white capitalize">{activeTab} View</h2>
-                    <div className="flex items-center gap-3 bg-slate-800/40 px-4 py-2 rounded-xl border border-slate-800">
-                        <UserCircle className="w-5 h-5 text-indigo-400" />
-                        <span className="text-sm font-medium text-slate-300">{user?.name}</span>
-                    </div>
-                </header>
+                
+                {/* Header code me dhoondhein aur aisi mapping setup karein: */}
+<header className="h-20 border-b border-slate-900 bg-slate-900/40 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-10">
+    <h2 className="text-xl font-bold text-white capitalize">{activeTab} View</h2>
+    <div className="flex items-center gap-4"> {/* Added gap-4 here */}
+        <NotificationBell /> {/* <-- Yeh component yahan inject karein */}
+        <div className="flex items-center gap-3 bg-slate-800/40 px-4 py-2 rounded-xl border border-slate-800">
+            <UserCircle className="w-5 h-5 text-indigo-400" />
+            <span className="text-sm font-medium text-slate-300">{user?.name}</span>
+        </div>
+    </div>
+</header>
 
                 <main className="p-8 max-w-7xl w-full mx-auto">
                     {/* Dashboard Tab */}

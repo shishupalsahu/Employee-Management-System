@@ -1,11 +1,12 @@
 import Task from '../models/Task.js';
-
-// @desc    Create and assign a new task (Admin Only)
+import Notification from '../models/Notification.js';// @desc    Create and assign a new task (Admin Only)
 // @route   POST /api/tasks
+// export const createTask = async (req, res) => {
 export const createTask = async (req, res) => {
     const { title, description, assignedTo, priority, deadline } = req.body;
 
     try {
+        // 1. Task create ho raha hai
         const task = await Task.create({
             title,
             description,
@@ -14,6 +15,15 @@ export const createTask = async (req, res) => {
             deadline
         });
 
+        // 2. LIVE TRIGGER: Employee ke liye notification create karein
+        await Notification.create({
+            recipient: assignedTo,   // Jis employee ko assign kiya
+            sender: req.user._id,    // Logged-in Admin (req.user se aayega kyunki route protected hai)
+            title: 'New Task Assigned 📋',
+            message: `You have been assigned a new task: "${title}". Please check your board.`
+        });
+
+        // 3. Response send karein
         res.status(201).json({ message: 'Task created and assigned successfully', task });
     } catch (error) {
         res.status(500).json({ message: error.message });
