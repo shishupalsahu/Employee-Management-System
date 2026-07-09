@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import { AuthContext } from '../context/AuthContext';
 import { Users, Clock, CheckCircle2, UserCircle, Plus, Trash2, UserPlus, X, Check, Calendar, AlertCircle } from 'lucide-react';
 import NotificationBell from '../components/NotificationBell';
+
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const { user } = useContext(AuthContext);
@@ -14,7 +15,11 @@ const AdminDashboard = () => {
     // Modals States
     const [showModal, setShowModal] = useState(false);
     const [showTaskModal, setShowTaskModal] = useState(false);
-    
+    const [showSalaryModal, setShowSalaryModal] = useState(false);
+    const [selectedEmpForSalary, setSelectedEmpForSalary] = useState(null);
+    const [salaryForm, setSalaryForm] = useState({ basicSalary: '', hra: '', allowances: '', deductions: '' });
+
+
     // Form States
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
     const [taskData, setTaskData] = useState({ title: '', description: '', assignedTo: '', priority: 'Medium', deadline: '' });
@@ -98,6 +103,41 @@ const AdminDashboard = () => {
             fetchTasks();
         } catch (err) { setFormError(err.message); }
     };
+    const handleOpenSalaryModal = async (emp) => {
+    setSelectedEmpForSalary(emp);
+    setSalaryForm({ basicSalary: '', hra: '', allowances: '', deductions: '' }); // reset
+    try {
+        // Purani salary config load karne ki koshish karein agar pehle se bani ho
+        const response = await fetch(`http://localhost:5000/api/salary/${emp._id}`, {
+            headers: { 'Authorization': `Bearer ${user.token}` }
+        });
+        const data = await response.json();
+        if (response.ok && data) {
+            setSalaryForm({
+                basicSalary: data.basicSalary || '',
+                hra: data.hra || '',
+                allowances: data.allowances || '',
+                deductions: data.deductions || ''
+            });
+        }
+    } catch (err) { console.error(err); }
+    setShowSalaryModal(true);
+};
+
+const handleSalarySubmit = async (e) => {
+    e.preventDefault();
+    try {
+        const response = await fetch('http://localhost:5000/api/salary/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
+            body: JSON.stringify({ employeeId: selectedEmpForSalary._id, ...salaryForm })
+        });
+        if (response.ok) {
+            setShowSalaryModal(false);
+            alert('Payroll distribution successfully authorized!');
+        }
+    } catch (err) { console.error(err); }
+};
 
     const handleDeleteTask = async (id) => {
         if (window.confirm('Delete this task deployment?')) {
@@ -245,6 +285,48 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                     )}
+                    {/* DYNAMIC TASK BOARD TAB */}
+                    {activeTab === 'tasks' && (
+                        <div className="space-y-6">
+                           {/* ... aapka purana task board ka code ... */}
+                        </div>
+                    )}
+
+                    {activeTab === 'payroll' && (
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="text-xl font-bold text-white">Financial Compensation Desk</h3>
+                                <p className="text-slate-400 text-sm">Configure baseline statements and tax-break updates.</p>
+                            </div>
+                            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="border-b border-slate-800 bg-slate-950/50 text-xs font-semibold uppercase text-slate-400">
+                                            <th className="p-4 pl-6">Employee Name</th>
+                                            <th className="p-4">Email ID</th>
+                                            <th className="p-4 pr-6 text-right">Payroll Configuration</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-800/40 text-sm text-slate-300">
+                                        {employees.map(emp => (
+                                            <tr key={emp._id} className="hover:bg-slate-800/20 transition">
+                                                <td className="p-4 pl-6 font-semibold text-white">{emp.name}</td>
+                                                <td className="p-4 text-slate-400">{emp.email}</td>
+                                                <td className="p-4 pr-6 text-right">
+                                                    <button 
+                                                        onClick={() => handleOpenSalaryModal(emp)} 
+                                                        className="bg-slate-950 hover:bg-slate-800 text-indigo-400 text-xs font-bold py-2 px-3 border border-slate-800 rounded-xl transition"
+                                                    >
+                                                        Manage Structure
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </main>
             </div>
 
@@ -303,7 +385,46 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             )}
-        </div>
+         {/* ... purana TASK ASSIGNMENT MODAL ke thik niche ... */}
+            {showTaskModal && (
+                <div className="fixed inset-0 z-50 ...">
+                     {/* ... code ... */}
+                </div>
+            )}
+
+            {/* === ISKE THIK NEECHE YEH NEW SALARY MODAL PASTE KAREIN === */}
+            {showSalaryModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 relative">
+                        <button onClick={() => setShowSalaryModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+                        <h3 className="text-lg font-bold text-white mb-1">Set Salary Matrix</h3>
+                        <p className="text-xs text-slate-400 mb-4">Configuring payroll profile for <span className="text-indigo-400 font-semibold">@{selectedEmpForSalary?.name}</span></p>
+                        
+                        <form onSubmit={handleSalarySubmit} className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Basic Salary (₹)</label><input type="number" required placeholder="50000" value={salaryForm.basicSalary} onChange={e => setSalaryForm({...salaryForm, basicSalary: e.target.value})} className="w-full bg-slate-950 border border-slate-800 text-white p-2.5 rounded-xl text-xs focus:outline-none focus:border-indigo-500" /></div>
+                                <div><label className="block text-[11px] font-semibold text-slate-400 uppercase mb-1">HRA Allowance (₹)</label><input type="number" required placeholder="15000" value={salaryForm.hra} onChange={e => setSalaryForm({...salaryForm, hra: e.target.value})} className="w-full bg-slate-950 border border-slate-800 text-white p-2.5 rounded-xl text-xs focus:outline-none focus:border-indigo-500" /></div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Other Perks (₹)</label><input type="number" required placeholder="5000" value={salaryForm.allowances} onChange={e => setSalaryForm({...salaryForm, allowances: e.target.value})} className="w-full bg-slate-950 border border-slate-800 text-white p-2.5 rounded-xl text-xs focus:outline-none focus:border-indigo-500" /></div>
+                                <div><label className="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Tax Deductions (₹)</label><input type="number" required placeholder="2000" value={salaryForm.deductions} onChange={e => setSalaryForm({...salaryForm, deductions: e.target.value})} className="w-full bg-slate-950 border border-slate-800 text-white p-2.5 rounded-xl text-xs focus:outline-none focus:border-indigo-500" /></div>
+                            </div>
+                            
+                            <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                                <span className="text-slate-400 font-medium">Estimated Net Pay:</span>
+                                <span className="font-bold text-emerald-400 text-sm">
+                                    ₹{ (Number(salaryForm.basicSalary) + Number(salaryForm.hra) + Number(salaryForm.allowances)) - Number(salaryForm.deductions) || 0 }
+                                </span>
+                            </div>
+                            
+                            <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2.5 rounded-xl transition shadow-lg shadow-indigo-600/20">Authorize & Dispatch</button>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>  
+
+        
     );
 };
 

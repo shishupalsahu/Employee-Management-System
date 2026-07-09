@@ -11,7 +11,8 @@ const EmployeeDashboard = () => {
     const [tasks, setTasks] = useState([]);
     const [leaves, setLeaves] = useState([]);
     const [stats, setStats] = useState({ activeTasks: 0, pendingLeaves: 0, completedTasks: 0 });
-    
+    const [salaryData, setSalaryData] = useState(null);
+    const [salaryError, setSalaryError] = useState(''); 
     // Leave Form State
     const [leaveForm, setLeaveForm] = useState({ leaveType: 'Sick Leave', startDate: '', endDate: '', reason: '' });
     const [formMessage, setFormMessage] = useState({ type: '', text: '' });
@@ -21,7 +22,32 @@ const EmployeeDashboard = () => {
             fetchMyTasks();
             fetchMyLeaves();
         }
+        if (user?.token) {
+        fetchMyTasks();
+        fetchMyLeaves();
+        if (activeTab === 'payroll') {
+            fetchMyPayroll();
+        }
+    }
     }, [user, activeTab]);
+
+    const fetchMyPayroll = async () => {
+    setSalaryError('');
+    try {
+        const response = await fetch(`http://localhost:5000/api/salary/${user._id}`, {
+            headers: { 'Authorization': `Bearer ${user.token}` }
+        });
+        const data = await response.json();
+        if (response.ok) {
+            setSalaryData(data);
+        } else {
+            setSalaryError(data.message || 'No payroll matrix generated yet.');
+        }
+    } catch (err) {
+        setSalaryError('Failed to fetch corporate payroll information.');
+    }
+     };
+
 
     const fetchMyTasks = async () => {
         try {
@@ -234,6 +260,66 @@ const EmployeeDashboard = () => {
                             </div>
                         </div>
                     )}
+                    
+                    {/* CORPORATE PAYROLL VIEWER TAB */}
+                    {activeTab === 'payroll' && (
+                        <div className="space-y-6 max-w-2xl mx-auto">
+                            <div>
+                                <h3 className="text-xl font-bold text-white">My Financial Statements</h3>
+                                <p className="text-slate-400 text-sm">View or print your active monthly breakdown profiles.</p>
+                            </div>
+
+                            {salaryError ? (
+                                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-500 text-xs">
+                                    ⚠️ {salaryError}
+                                </div>
+                            ) : salaryData ? (
+                                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden before:absolute before:top-0 before:left-0 before:w-full before:h-1.5 before:bg-gradient-to-r before:from-indigo-500 before:to-emerald-500">
+                                    {/* Pay-Slip Header */}
+                                    <div className="flex justify-between items-start border-b border-slate-800/60 pb-6">
+                                        <div>
+                                            <h4 className="text-lg font-black text-white tracking-wide">EMS CORPORATE INVOICE</h4>
+                                            <p className="text-[10px] text-slate-500 mt-0.5 uppercase tracking-wider font-semibold">Salary Statement Certificate</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 text-[10px] font-bold uppercase tracking-wide">Disbursed</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Meta Information Grid */}
+                                    <div className="grid grid-cols-2 gap-4 my-6 text-xs bg-slate-950/40 p-4 rounded-xl border border-slate-800/40">
+                                        <div><p className="text-slate-500 font-medium">Employee Name</p><p className="text-white font-bold mt-0.5">{user?.name}</p></div>
+                                        <div><p className="text-slate-500 font-medium">Account Email</p><p className="text-slate-300 font-medium mt-0.5 truncate">{user?.email}</p></div>
+                                    </div>
+
+                                    {/* Earnings vs Deductions Matrix */}
+                                    <div className="space-y-3.5 text-xs">
+                                        <div className="flex justify-between items-center text-slate-400"><span className="font-medium">Basic Fixed Component</span><span className="font-bold text-slate-200">₹{salaryData.basicSalary}</span></div>
+                                        <div className="flex justify-between items-center text-slate-400"><span className="font-medium">House Rent Allowance (HRA)</span><span className="font-bold text-slate-200">₹{salaryData.hra}</span></div>
+                                        <div className="flex justify-between items-center text-slate-400"><span className="font-medium">Special Dynamic Perks</span><span className="font-bold text-slate-200">₹{salaryData.allowances}</span></div>
+                                        <div className="flex justify-between items-center text-rose-400/90 border-t border-slate-800/40 pt-3.5"><span className="font-medium">Statutory Tax Deductions</span><span className="font-bold">-(₹{salaryData.deductions})</span></div>
+                                        
+                                        {/* Total Net Take Home */}
+                                        <div className="flex justify-between items-center bg-slate-950 p-4 rounded-xl border border-slate-800 mt-4">
+                                            <span className="text-sm font-bold text-white">Net Take-Home Salary</span>
+                                            <span className="text-lg font-black text-emerald-400">₹{salaryData.netSalary}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Print/Download Button */}
+                                    <button 
+                                        onClick={() => window.print()} 
+                                        className="w-full mt-6 bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold py-2.5 rounded-xl border border-slate-800 transition shadow-md"
+                                    >
+                                        🖨️ Print Statement
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="p-8 text-center text-slate-500 text-xs">Loading payroll environment...</div>
+                            )}
+                        </div>
+                    )}
+
                 </main>
             </div>
         </div>
