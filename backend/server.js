@@ -7,6 +7,7 @@ import employeeRoutes from './routes/employeeRoutes.js';
 import leaveRoutes from './routes/leaveRoutes.js';
 import taskRoutes from './routes/taskRoutes.js'; // <-- 1. Import Task Routes
 import notificationRoutes from './routes/notificationRoutes.js'; // Environment variables configuration
+import salaryRoutes from './routes/salaryRoutes.js';
 dotenv.config();
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/leave', leaveRoutes);
 app.use('/api/tasks', taskRoutes); // <-- 2. Use Task Routes
 app.use('/api/notifications', notificationRoutes);// Basic Test Route
+app.use('/api/salary', salaryRoutes);
 app.get('/', (req, res) => {
     res.send('Employee Management System API is running...');
 });
