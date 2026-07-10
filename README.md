@@ -4,6 +4,13 @@ An advanced, full-stack enterprise-grade application designed to optimize corpor
 
 ---
 
+## 🌐 Live Deployment Links
+
+* **💻 Live Production UI (Frontend):** [https://employee-management-system-gamma-liard.vercel.app](https://employee-management-system-gamma-liard.vercel.app/login)
+* **⚙️ Live API Engine (Backend):** [https://ems-backend-zui4.onrender.com](https://ems-backend-zui4.onrender.com/)
+
+---
+
 ## ✨ Premium Core Features
 
 ### 🔐 1. Gateway Security & Session Architecture
