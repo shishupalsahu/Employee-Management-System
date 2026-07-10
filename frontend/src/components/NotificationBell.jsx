@@ -32,7 +32,7 @@ const NotificationBell = () => {
 
     const fetchNotifications = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/notifications', {
+            const response = await fetch('https://ems-backend-zui4.onrender.com/api/notifications', {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const data = await response.json();
@@ -43,8 +43,8 @@ const NotificationBell = () => {
     };
 
     const markAsRead = async (id) => {
-        try {
-            const response = await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+    try {
+        const response = await fetch(`https://ems-backend-zui4.onrender.com/api/notifications/${id}/read`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });

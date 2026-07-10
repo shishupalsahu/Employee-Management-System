@@ -39,5 +39,5 @@ mongoose.connect(MONGO_URI)
         });
     })
     .catch((error) => {
-        console.error('Database connection failed ❌:', error.message);
-    });
+    console.error(error);
+});

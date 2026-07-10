@@ -34,7 +34,7 @@ const EmployeeDashboard = () => {
     const fetchMyPayroll = async () => {
     setSalaryError('');
     try {
-        const response = await fetch(`http://localhost:5000/api/salary/${user._id}`, {
+        const response = await fetch(`https://ems-backend-zui4.onrender.com/api/salary/${user._id}`, {
             headers: { 'Authorization': `Bearer ${user.token}` }
         });
         const data = await response.json();
@@ -51,7 +51,7 @@ const EmployeeDashboard = () => {
 
     const fetchMyTasks = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/tasks', {
+            const response = await fetch('https://ems-backend-zui4.onrender.com/api/tasks', {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const data = await response.json();
@@ -68,7 +68,7 @@ const EmployeeDashboard = () => {
 
     const fetchMyLeaves = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/leave/history', {
+            const response = await fetch('https://ems-backend-zui4.onrender.com/api/leave/history', {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const data = await response.json();
@@ -81,7 +81,7 @@ const EmployeeDashboard = () => {
 
     const handleStatusChange = async (taskId, newStatus) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+            const response = await fetch(`https://ems-backend-zui4.onrender.com/api/tasks/${taskId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ const EmployeeDashboard = () => {
         e.preventDefault();
         setFormMessage({ type: '', text: '' });
         try {
-            const response = await fetch('http://localhost:5000/api/leave/apply', {
+            const response = await fetch('https://ems-backend-zui4.onrender.com/api/leave/apply', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

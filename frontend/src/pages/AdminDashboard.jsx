@@ -35,7 +35,7 @@ const AdminDashboard = () => {
 
     const fetchEmployees = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/employees', {
+            const response = await fetch('https://ems-backend-zui4.onrender.com/api/employees', {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const data = await response.json();
@@ -48,7 +48,7 @@ const AdminDashboard = () => {
 
     const fetchLeaves = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/leave/history', {
+            const response = await fetch('https://ems-backend-zui4.onrender.com/api/leave/history', {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const data = await response.json();
@@ -61,7 +61,7 @@ const AdminDashboard = () => {
 
     const fetchTasks = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/tasks', {
+            const response = await fetch('https://ems-backend-zui4.onrender.com/api/tasks', {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const data = await response.json();
@@ -76,7 +76,7 @@ const AdminDashboard = () => {
         e.preventDefault();
         setFormError('');
         try {
-            const response = await fetch('http://localhost:5000/api/employees', {
+            const response = await fetch('https://ems-backend-zui4.onrender.com/api/employees', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
                 body: JSON.stringify(formData)
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
         e.preventDefault();
         setFormError('');
         try {
-            const response = await fetch('http://localhost:5000/api/tasks', {
+            const response = await fetch('https://ems-backend-zui4.onrender.com/api/tasks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
                 body: JSON.stringify(taskData)
@@ -108,7 +108,7 @@ const AdminDashboard = () => {
     setSalaryForm({ basicSalary: '', hra: '', allowances: '', deductions: '' }); // reset
     try {
         // Purani salary config load karne ki koshish karein agar pehle se bani ho
-        const response = await fetch(`http://localhost:5000/api/salary/${emp._id}`, {
+        const response = await fetch(`https://ems-backend-zui4.onrender.com/api/salary/${emp._id}`, {
             headers: { 'Authorization': `Bearer ${user.token}` }
         });
         const data = await response.json();
@@ -127,7 +127,7 @@ const AdminDashboard = () => {
 const handleSalarySubmit = async (e) => {
     e.preventDefault();
     try {
-        const response = await fetch('http://localhost:5000/api/salary/update', {
+        const response = await fetch('https://ems-backend-zui4.onrender.com/api/salary/update', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
             body: JSON.stringify({ employeeId: selectedEmpForSalary._id, ...salaryForm })
@@ -142,7 +142,7 @@ const handleSalarySubmit = async (e) => {
     const handleDeleteTask = async (id) => {
         if (window.confirm('Delete this task deployment?')) {
             try {
-                const response = await fetch(`http://localhost:5000/api/tasks/${id}`, {
+                const response = await fetch(`https://ems-backend-zui4.onrender.com/api/tasks/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${user.token}` }
                 });
@@ -154,7 +154,7 @@ const handleSalarySubmit = async (e) => {
     const handleDeleteEmployee = async (id) => {
         if (window.confirm('Remove employee?')) {
             try {
-                const response = await fetch(`http://localhost:5000/api/employees/${id}`, {
+                const response = await fetch(`https://ems-backend-zui4.onrender.com/api/employees/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${user.token}` }
                 });
@@ -165,7 +165,7 @@ const handleSalarySubmit = async (e) => {
 
     const handleLeaveStatusUpdate = async (id, status) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/leave/approve/${id}`, {
+            const response = await fetch(`https://ems-backend-zui4.onrender.com/api/leave/approve/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
                 body: JSON.stringify({ status })
