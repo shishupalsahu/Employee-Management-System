@@ -34,17 +34,24 @@ const AdminDashboard = () => {
     }, [user, activeTab]);
 
     const fetchEmployees = async () => {
-        try {
-            const response = await fetch('https://ems-backend-zui4.onrender.com/api/employees', {
-                headers: { 'Authorization': `Bearer ${user.token}` }
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setEmployees(data);
-                setStats(prev => ({ ...prev, employees: data.length }));
-            }
-        } catch (err) { console.error(err); }
-    };
+    try {
+        // ⚠️ Dhyan dein: Yahan aapka LIVE render backend URL hona chahiye!
+        const response = await fetch('https://ems-backend-zui4.onrender.com/api/employees', {
+            headers: { 'Authorization': `Bearer ${user.token}` }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to get staff roster');
+        }
+
+        const data = await response.json();
+        if (Array.isArray(data)) {
+            setEmployees(data);
+        }
+    } catch (err) {
+        console.error("Error fetching employees for task dropdown:", err);
+    }
+};
 
     const fetchLeaves = async () => {
         try {

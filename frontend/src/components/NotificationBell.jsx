@@ -10,41 +10,53 @@ const NotificationBell = () => {
 
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
+    // === FIX 1: CONTROLLED INTERVAl MECHANISM ===
     useEffect(() => {
+        // Sirf tabhi fetch karein jab token real me maujood ho
         if (user?.token) {
             fetchNotifications();
-            // Optional: Auto-refresh notifications every 30 seconds
+            
+            // Interval ko humne 15-30 seconds par safe lock kiya hai
             const interval = setInterval(fetchNotifications, 30000);
             return () => clearInterval(interval);
         }
-    }, [user]);
+    }, [user?.token]); // 👈 Puraane '[user]' ko hata kar sirf '[user?.token]' kiya taaki loop na bane
 
     // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsOpen(false);
+                $setIsOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // === FIX 2: SAFE DATA RETRIEVAL ===
     const fetchNotifications = async () => {
+        if (!user?.token) return; // Guard clause taaki crash na ho
         try {
             const response = await fetch('https://ems-backend-zui4.onrender.com/api/notifications', {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
-            const data = await response.json();
-            if (response.ok) setNotifications(data);
+            
+            if (response.ok) {
+                const data = await response.json();
+                // Check karein ki data array hai ya nahi, tabhi state set karein
+                if (Array.isArray(data)) {
+                    setNotifications(data);
+                }
+            }
         } catch (err) {
             console.error("Error fetching notifications:", err);
         }
     };
 
     const markAsRead = async (id) => {
-    try {
-        const response = await fetch(`https://ems-backend-zui4.onrender.com/api/notifications/${id}/read`, {
+        if (!user?.token) return;
+        try {
+            const response = await fetch(`https://ems-backend-zui4.onrender.com/api/notifications/${id}/read`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
